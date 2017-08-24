@@ -69,18 +69,16 @@ namespace Sitecore.Support.ContentSearch.Pipelines.GetContextIndex
             {
                 return tupleArray[0].First.Name;
             }
-            //Sitecore.Support.171629
-            var higherRank = tupleArray[0].Second;
-            Sitecore.Caching.Generics.Tuple<ISearchIndex, int>[] tupleArray2 = (from i in tupleArray
-                                                                                where (i.First.GetType() == defaultType || i.First.GetType().IsSubclassOf(defaultType)) && i.Second == higherRank
-                                                                                orderby i.First.Name
-                                                                                select i).ToArray<Sitecore.Caching.Generics.Tuple<ISearchIndex, int>>();
-            //
+            //Sitecore.Support.171629            
+            Sitecore.Caching.Generics.Tuple<ISearchIndex, int>[] tupleArrayHigherRank = tupleArray.Where(i => i.Second == tupleArray[0].Second).OrderBy(i => i.First.Name).ToArray<Sitecore.Caching.Generics.Tuple<ISearchIndex, int>>();
+
+            var tupleArray2 = tupleArrayHigherRank.Where(i => i.First.GetType() == defaultType || i.First.GetType().IsSubclassOf(defaultType)).ToArray();
             if (!tupleArray2.Any<Sitecore.Caching.Generics.Tuple<ISearchIndex, int>>())
             {
-                return tupleArray[0].First.Name;
+                return tupleArrayHigherRank[0].First.Name;
             }
             return tupleArray2[0].First.Name;
+            //
         }
     }
 }
